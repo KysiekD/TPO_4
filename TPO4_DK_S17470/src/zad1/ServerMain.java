@@ -141,26 +141,12 @@ public class ServerMain extends Thread {
 						msgFromClient);
 				writeResponse(socketChannel, 1, "Success - added to category subscritpion.");
 			} else if (command.equals("3")) {
-				String news = "";
-				String header = "";
-				String content = "";
-				System.out.println("SERVER: received message: " + requestString);
-				for (Category category : Category.getTopicExtension()) {
-					//System.out.println(category.getCategoryName()); //TEST
-					if (category.getSubscribedClientsList().contains(clientName)) {
-						//System.out.println(clientName); //TEST
-						for (String newsHeader : category.getNewsModelsFromList()) {
-							NewsModel newsModel = category.getNewsModelByHeader(newsHeader);
-							header = newsModel.getNewsHeader();
-							//System.out.println(header); //TEST
-							content = newsModel.getNewsContent();
-							//System.out.println(content); //TEST
-							news = news + header.toUpperCase() + "-" + content.toLowerCase() + "\n";
-						}
-					}
-				}
-				System.out.println(news);
+
+				String news = showNews(clientName);
 				writeResponse(socketChannel, 1, news);
+			} else if (command.equals("4")) {
+				String clientCategories = showClientCategories(clientName);
+				writeResponse(socketChannel, 1, clientCategories);
 			} else {
 				System.out.println("Bad request.");
 			}
@@ -205,12 +191,62 @@ public class ServerMain extends Thread {
 	}
 
 	public String showAllCategories() throws InterruptedException {
-		String msg = "Categories: ";
+		String msg = "All categories: ";
 		for (Category category : Category.getTopicExtension()) {
 			// msg = msg.join(",",msg, category.getCategoryName());
 			msg = msg + category.getCategoryName() + ",";
 		}
-		Thread.sleep(2000);
+		// Thread.sleep(2000);
+		if (msg != null && msg.length() > 0
+				&& msg.charAt(msg.length() - 1) == ',')
+			msg = msg.substring(0, msg.length() - 1);
 		return msg;
+	}
+
+	public String showNews(String clientName) {
+		String news = "News: \n";
+		String header = "";
+		String content = "";
+		for (Category category : Category.getTopicExtension()) {
+			// System.out.println(category.getCategoryName()); //TEST
+			try {
+				if (category.getSubscribedClientsList().contains(clientName)) {
+					// System.out.println(clientName); //TEST
+					for (String newsHeader : category.getNewsModelsFromList()) {
+						NewsModel newsModel = category.getNewsModelByHeader(newsHeader);
+						header = newsModel.getNewsHeader();
+						// System.out.println(header); //TEST
+						content = newsModel.getNewsContent();
+						// System.out.println(content); //TEST
+						news = news + header.toUpperCase() + "-" + content.toLowerCase() + "\n";
+					}
+				}
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return news;
+	}
+
+	public String showClientCategories(String clientName) {
+		String categoriesString = "My categories: ";
+
+		for (Category category : Category.getTopicExtension()) {
+			// System.out.println(category.getCategoryName()); //TEST
+
+			try {
+				if (category.getSubscribedClientsList().contains(clientName)) {
+					// System.out.println(clientName); //TEST
+					categoriesString = categoriesString + category.getCategoryName() + ", ";
+				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		if (categoriesString != null && categoriesString.length() > 0
+				&& categoriesString.charAt(categoriesString.length() - 1) == ',')
+			categoriesString = categoriesString.substring(0, categoriesString.length() - 1);
+		return categoriesString;
 	}
 }

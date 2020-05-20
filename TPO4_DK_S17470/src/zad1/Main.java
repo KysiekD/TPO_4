@@ -1,5 +1,6 @@
 package zad1;
 
+import Views.ClientView;
 import zad1.Models.Category;
 import zad1.Models.ClientModel;
 import zad1.Models.NewsModel;
@@ -16,7 +17,7 @@ public class Main {
 		int clientPortNumber = 45666;
 		String clientName = "Boris";
 
-		ServerMain Server = new ServerMain(serverHostName, serverPortNumber);
+		ServerMain server = new ServerMain(serverHostName, serverPortNumber);
 		try {
 			Category ScienceCategory = new Category("Science");
 			ScienceCategory.addNewsToNewsList("Mammoths are still alive!");
@@ -31,29 +32,32 @@ public class Main {
 			e.printStackTrace();
 		}
 
-		ClientModel Client = new ClientModel(clientHostName, clientPortNumber, clientName);
-		
 
+		ClientModel client = new ClientModel(clientHostName, clientPortNumber, clientName);
+		
+		//client.connectToServer();
+		//client.suscribeCategory("Weather");
+		//client.closeConnectionToServer();
+		
+		ClientView clientApplication = new ClientView(client);
 		 
 		 
-
-		Client.connectToServer(serverHostName, serverPortNumber);
-		 //Test addClientToSubscrivesList:
 		
 
-		Client.suscribeCategory("Weather");
-		//Thread.sleep(2000);
-		System.out.println("Clients subscribed to weather: " + Category.getCategoryByName("Weather").getSubscribedClientsList());
-		//Thread.sleep(2000);
+		/*
+		client.suscribeCategory("Weather");
+		//System.out.println("Clients subscribed to weather: " + Category.getCategoryByName("Weather").getSubscribedClientsList());
 
 
-		// Test viewAllCategories
-		String categories = Client.viewAllCategories();
+		//String categories = client.viewAllCategories();
 		
-		Client.showNews();
+		String myCategories = client.viewMyCategories();
+		System.out.println("Clients categoriesssss: "+myCategories);
+		//client.showNews();
 		
-		//Client.closeConnectionToServer();
-
+		
+		//client.closeConnectionToServer();
+		 */
 		System.out.println("END OF PROGRAM");
 	}
 

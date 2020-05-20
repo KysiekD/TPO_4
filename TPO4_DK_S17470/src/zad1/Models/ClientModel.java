@@ -30,6 +30,9 @@ public class ClientModel extends Thread {
 	private ByteBuffer byteBuffer; // Bufor bajtowy - do niego s¹ wczytywane dane z kana³u
 	private SocketChannel socketChannel;
 
+	private final static String serverHost = "localhost";
+	private final static int serverPort = 44500;
+
 	public ClientModel(String host, int port, String clientName) {
 		clientHostName = host;
 		clientPortNumber = port;
@@ -48,7 +51,7 @@ public class ClientModel extends Thread {
 		}
 	}
 
-	public void connectToServer(String serverHost, int serverPort) {
+	public void connectToServer() {
 		try {
 			System.out.println("CLIENT:  " + clientHostName + " on port " + clientPortNumber
 					+ " is trying to connect server " + serverHost + " with port " + serverPort);
@@ -68,6 +71,7 @@ public class ClientModel extends Thread {
 			outBufferedWriter.close();
 			inBufferedReader.close();
 			connectionSocket.close();
+			System.out.println("CLIENT: closed connection.");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -87,7 +91,9 @@ public class ClientModel extends Thread {
 			int count;
 			byte[] bytesTable = new byte[8192];
 			// while ((count = in.read(bytesTable)) > 0) {
-			count = in.read(bytesTable); //dodane w miejsce powy¿szej pêtli
+
+			count = in.read(bytesTable); // dodane w miejsce powy¿szej pêtli
+			System.out.println("CLIENT: incoming bytes: " + count);
 			System.out.println("Bytes: " + count);
 			String text1 = new String(bytesTable, "UTF-8");
 			String text2 = new String(bytesTable, "ISO-8859-1");
@@ -104,21 +110,17 @@ public class ClientModel extends Thread {
 	}
 
 	public String viewAllCategories() throws InterruptedException {
-		writeMsg(1, this.getClientName(), this.getClientHostName(), this.getClientPortNumber(), "categories");
-		Thread.sleep(2000);
+		writeMsg(1, this.getClientName(), this.getClientHostName(), this.getClientPortNumber(), "all categories");
+		// Thread.sleep(2000);
 		String msg = readMsg();
 		// this.closeConnectionToServer();
 		return msg;
 	}
 
-	public void viewMyCategories() {
-
-	}
-
 	public void suscribeCategory(String categoryName) throws InterruptedException {
-		Thread.sleep(2000);
+		// Thread.sleep(2000);
 		writeMsg(2, this.getClientName(), this.getClientHostName(), this.getClientPortNumber(), categoryName);
-		Thread.sleep(2000);
+		// Thread.sleep(2000);
 
 	}
 
@@ -126,10 +128,21 @@ public class ClientModel extends Thread {
 
 	}
 
-	public void showNews() throws InterruptedException {
-		Thread.sleep(2000);
+	public String showNews() throws InterruptedException {
+		// Thread.sleep(2000);
 		writeMsg(3, this.getClientName(), this.getClientHostName(), this.getClientPortNumber(), "news");
-		Thread.sleep(2000);
+		// Thread.sleep(2000);
+		readMsg();
+		String msg = readMsg();
+		return msg;
+	}
+
+	public String viewMyCategories() throws InterruptedException {
+		writeMsg(4, this.getClientName(), this.getClientHostName(), this.getClientPortNumber(), "my categories");
+		// Thread.sleep(2000);
+		String msg = readMsg();
+
+		return msg;
 	}
 
 	public String getClientHostName() {
@@ -146,6 +159,14 @@ public class ClientModel extends Thread {
 
 	public void setClientName(String clientName) {
 		this.clientName = clientName;
+	}
+
+	public static String getServerhost() {
+		return serverHost;
+	}
+
+	public static int getServerport() {
+		return serverPort;
 	}
 
 }
