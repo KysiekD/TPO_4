@@ -10,6 +10,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import zad1.Checker;
 import zad1.Models.ClientModel;
 
 public class CategoryButton extends JButton implements ActionListener{
@@ -21,6 +22,7 @@ public class CategoryButton extends JButton implements ActionListener{
 	private SubscribeButton subscribeButton;
 	private String allCategories;
 	private String myCategories;
+	private UnsubscribeButton unsubscribeButton;
 	
 	
 	public CategoryButton(String text, ClientModel model) {
@@ -60,6 +62,10 @@ public class CategoryButton extends JButton implements ActionListener{
 		subscribeButton.addActionListener(subscribeButton);
 		categoriesPanel.add(subscribeButton);
 		
+		unsubscribeButton = new UnsubscribeButton("Unsubscribe",  model, textField, this);
+		unsubscribeButton.addActionListener(unsubscribeButton);
+		categoriesPanel.add(unsubscribeButton);
+		
 		categoriesFrame.add(categoriesPanel);
 		categoriesFrame.setSize(400,200);
 		categoriesFrame.setLocationRelativeTo(null);
@@ -72,12 +78,13 @@ public class CategoryButton extends JButton implements ActionListener{
 
 	
 	public void checkCategories() {
+		
 		System.out.println("CLIENT: Category button clicked.");
-
-		model.connectToServer();
+		
+		//model.connectToServer();
 		try {
 			allCategories = model.viewAllCategories();
-			Thread.sleep(1000);
+			
 			myCategories = model.viewMyCategories();
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();

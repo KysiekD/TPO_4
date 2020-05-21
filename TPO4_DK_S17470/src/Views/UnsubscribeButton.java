@@ -4,19 +4,19 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JTextField;
 
 import zad1.Models.ClientModel;
 
-public class SubscribeButton extends JButton implements ActionListener {
+public class UnsubscribeButton extends JButton implements ActionListener {
+
 	private ClientModel model;
 	private JTextField categoryNameTextField;
 	private CategoryButton categoryButton;
-	
-	public SubscribeButton(String text, ClientModel model, 
+
+	public UnsubscribeButton(String text, ClientModel model, 
 			JTextField categoryNameTextField,
-			CategoryButton categoryButton) {
+			CategoryButton categoryButton){
 		super(text);
 		this.model = model;
 		this.categoryNameTextField = categoryNameTextField;
@@ -25,16 +25,14 @@ public class SubscribeButton extends JButton implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		System.out.println("CLIENT: Subscribe button clicked.");
+		System.out.println("CLIENT: Unsuscribe button clicked.");
+
 		String categoryName = categoryNameTextField.getText();
-		//model.connectToServer();
-		try {
-			model.suscribeCategory(categoryName);
-		} catch (InterruptedException e1) {
-			e1.printStackTrace();
-		}
+		model.connectToServer();
+
+		model.unsuscribeCategory(categoryName);
+
 		categoryButton.checkCategories();
 		categoryButton.refreshPanel();
 	}
-
 }

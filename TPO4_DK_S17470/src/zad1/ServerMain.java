@@ -67,7 +67,7 @@ public class ServerMain extends Thread {
 		while (serverIsRunning) {
 
 			try {
-
+				Checker.check("ServerMain serviceConnections();...");
 				selector.select(); // Wywo³anie blokuj¹ce,czeka na zajœcie zdarzenia zwi¹zanego z kana³ami,
 									// zarejestrowanymi do obslugi przez selektor
 				Set<SelectionKey> keys = selector.selectedKeys(); // Coœ siê wydarzy³o na kana³ach,Zbiór kluczy opisuje
@@ -132,21 +132,39 @@ public class ServerMain extends Thread {
 			String msgFromClient = requestTable[4];
 
 			if (command.equals("1")) {
+				//show all categories:
+				Checker.check("ServerMain serviceRequest(): ...");
 				System.out.println("SERVER: received message: " + requestString);
 				String allCategoriesString = this.showAllCategories();
 				writeResponse(socketChannel, 1, allCategoriesString);
 			} else if (command.equals("2")) {
+				//add client to subscription of the category
 				System.out.println("SERVER: received message: " + requestString);
-				this.addClientToSubscribesList(clientHostName, Integer.parseInt(clientPortNumber), clientName,
+				Boolean success = this.addClientToSubscribesList(clientHostName, Integer.parseInt(clientPortNumber), clientName,
 						msgFromClient);
+				
+				if(success = true) {
 				writeResponse(socketChannel, 1, "Success - added to category subscritpion.");
+				}else
+					writeResponse(socketChannel, 1, "Falied - no such a category.");
 			} else if (command.equals("3")) {
-
+				System.out.println("SERVER: received message: " + requestString);
+				//show news
 				String news = showNews(clientName);
 				writeResponse(socketChannel, 1, news);
 			} else if (command.equals("4")) {
+				System.out.println("SERVER: received message: " + requestString);
+				//show client's categories
 				String clientCategories = showClientCategories(clientName);
 				writeResponse(socketChannel, 1, clientCategories);
+			}else if(command.equals("5")) {
+				System.out.println("SERVER: received message: " + requestString);
+				Boolean success = this.removeClientFromSubscribesList(clientName, msgFromClient);
+				if(success = true) {
+					writeResponse(socketChannel, 1, "Success - removed category subscritpion.");
+					}else
+						writeResponse(socketChannel, 1, "Falied - no such a category.");
+				
 			} else {
 				System.out.println("Bad request.");
 			}
@@ -185,9 +203,24 @@ public class ServerMain extends Thread {
 	 * categoriesList.add(categoryName); }
 	 */
 
-	public void addClientToSubscribesList(String host, int port, String clientName, String categoryName)
+	public boolean addClientToSubscribesList(String host, int port, String clientName, String categoryName)
 			throws InterruptedException {
-		Category.getCategoryByName(categoryName).addClientToSubscribesList(clientName, host, port);
+		if (Category.getCategoryByName(categoryName) == null) {
+			return false;
+		} else {
+
+			Category.getCategoryByName(categoryName).addClientToSubscribesList(clientName, host, port);
+			return true;
+		}
+	}
+	
+	public boolean removeClientFromSubscribesList(String clientName, String categoryName) {
+		if (Category.getCategoryByName(categoryName) == null) {
+			return false;
+		}else {
+		Category.getCategoryByName(categoryName).removeClientFromSubscribesList(clientName);
+		return true;
+		}
 	}
 
 	public String showAllCategories() throws InterruptedException {
@@ -197,8 +230,7 @@ public class ServerMain extends Thread {
 			msg = msg + category.getCategoryName() + ",";
 		}
 		// Thread.sleep(2000);
-		if (msg != null && msg.length() > 0
-				&& msg.charAt(msg.length() - 1) == ',')
+		if (msg != null && msg.length() > 0 && msg.charAt(msg.length() - 1) == ',')
 			msg = msg.substring(0, msg.length() - 1);
 		return msg;
 	}
@@ -238,7 +270,7 @@ public class ServerMain extends Thread {
 			try {
 				if (category.getSubscribedClientsList().contains(clientName)) {
 					// System.out.println(clientName); //TEST
-					categoriesString = categoriesString + category.getCategoryName() + ", ";
+					categoriesString = categoriesString + category.getCategoryName() + ",";
 				}
 			} catch (InterruptedException e) {
 				e.printStackTrace();

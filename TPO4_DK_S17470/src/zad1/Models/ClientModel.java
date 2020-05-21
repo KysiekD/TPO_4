@@ -15,6 +15,8 @@ import java.nio.CharBuffer;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.Charset;
 
+import zad1.Checker;
+
 public class ClientModel extends Thread {
 
 	private String clientHostName;
@@ -43,6 +45,7 @@ public class ClientModel extends Thread {
 		clientRunning = true;
 		System.out.println("CLIENT: " + clientHostName + " on port " + clientPortNumber + " started.");
 		start();
+		this.connectToServer();
 	}
 
 	public void run() {
@@ -53,9 +56,12 @@ public class ClientModel extends Thread {
 
 	public void connectToServer() {
 		try {
+		
 			System.out.println("CLIENT:  " + clientHostName + " on port " + clientPortNumber
 					+ " is trying to connect server " + serverHost + " with port " + serverPort);
+			
 			connectionSocket = new Socket(serverHost, serverPort);
+
 			inBufferedReader = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
 
 			outBufferedWriter = new PrintWriter(connectionSocket.getOutputStream(), true);
@@ -110,9 +116,13 @@ public class ClientModel extends Thread {
 	}
 
 	public String viewAllCategories() throws InterruptedException {
+		Checker.check("ClientModel writeMsg():...");
 		writeMsg(1, this.getClientName(), this.getClientHostName(), this.getClientPortNumber(), "all categories");
+		Checker.check("ClientModel writeMsg(): DONE");
 		// Thread.sleep(2000);
+		Checker.check("ClientModel readMsg(): ...");
 		String msg = readMsg();
+		Checker.check("ClientModel readMsg(): DONE");
 		// this.closeConnectionToServer();
 		return msg;
 	}
@@ -121,18 +131,18 @@ public class ClientModel extends Thread {
 		// Thread.sleep(2000);
 		writeMsg(2, this.getClientName(), this.getClientHostName(), this.getClientPortNumber(), categoryName);
 		// Thread.sleep(2000);
-
-	}
-
-	public void unsuscribeTopic() {
-
-	}
-
-	public String showNews() throws InterruptedException {
-		// Thread.sleep(2000);
-		writeMsg(3, this.getClientName(), this.getClientHostName(), this.getClientPortNumber(), "news");
-		// Thread.sleep(2000);
 		readMsg();
+
+	}
+
+	public void unsuscribeCategory(String categoryName) {
+		writeMsg(5, this.getClientName(), this.getClientHostName(), this.getClientPortNumber(), categoryName);
+		readMsg();
+	}
+
+	public String showNews() {
+		writeMsg(3, this.getClientName(), this.getClientHostName(), this.getClientPortNumber(), "news");
+		//readMsg();
 		String msg = readMsg();
 		return msg;
 	}

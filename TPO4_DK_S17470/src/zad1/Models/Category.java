@@ -40,21 +40,23 @@ public class Category {
 	}
 	
 	
-	public void addClientToSubscribesList(String clientName, String clientHostName, int clientPortNumber) throws InterruptedException {
+	public void addClientToSubscribesList(String clientName, String clientHostName, int clientPortNumber){
 		//ClientModel clientModel = new ClientModel(clientHostName, clientPort, clientName);
 		//subscribesList.put(clientModel.getClientName(), clientModel);
-		Thread.sleep(2000);
-
+		
 		String [] clientInfo = new String[3];
 		clientInfo[0]=clientName;
 		clientInfo[1]=clientHostName;
 		clientInfo[2]=String.valueOf(clientPortNumber);
 		subscribesList.put(clientName, clientInfo);
-		Thread.sleep(2000);
+		
 
 	}
 	
+	public void removeClientFromSubscribesList(String clientName) {
 
+		subscribesList.remove(clientName);
+	}
 	
 	public void addNewsToNewsList(String newsHeader) {
 		NewsModel newsModel = new NewsModel(newsHeader);
@@ -77,7 +79,7 @@ public class Category {
 	public Set<String> getSubscribedClientsList() throws InterruptedException {
 		//.....dokonczyc
 		//System.out.println(subscribesList.keySet());
-		Thread.sleep(2000);
+		
 
 		return subscribesList.keySet();
 		
